@@ -157,14 +157,27 @@ erDiagram
 **Q1.1 — Como criar uma model no Laravel?**
 
 > _Resposta:_
+> Para criar uma model no Laravel, dá para usar o comando `php artisan make:model NomeDaModel`.
 >
+> Nesse projeto, por exemplo, foram criadas as models `Autor` e `Livro` usando:
 >
+> `php artisan make:model Autor`
+>
+> `php artisan make:model Livro`
+>
+> Depois disso, o Laravel cria os arquivos dentro da pasta `app/Models`.
+
 
 **Q1.2 — Como funciona uma model? Explique o papel das propriedades `$table` e `$fillable` e dos relacionamentos `hasMany` / `belongsTo`.**
 
 > _Resposta:_
+> A model serve para representar os dados do banco dentro do sistema.
 >
+> O `$table` é usado para informar qual tabela aquela model representa.
 >
+> Já o `$fillable` serve para definir quais campos podem receber dados quando a gente faz um cadastro ou uma atualização.
+>
+> Os relacionamentos servem para ligar uma model com outra. Nesse caso, usamos `hasMany` porque um autor pode ter vários livros, e usamos `belongsTo` porque cada livro pertence a um autor.
 
 ---
 
@@ -181,14 +194,28 @@ Confira no MySQL se as tabelas `autores` e `livros` foram criadas.
 **Q2.1 — Como criar uma migration e aplicá-la no banco de dados?**
 
 > _Resposta:_
+> Para criar uma migration, usamos o comando `php artisan make:migration nome_da_migration`.
 >
+> Depois de criar a migration, a gente define os campos da tabela dentro dela.
 >
+> Quando tudo estiver pronto, usamos:
+>
+> `php artisan migrate`
+>
+> Esse comando executa as migrations e cria as tabelas no banco de dados.
 
 **Q2.2 — Como funciona uma migration? Explique os métodos `up()` e `down()`, a importância da ordem de execução e o que faz `foreignId(...)->constrained(...)`.**
 
 > _Resposta:_
+> A migration serve para criar e controlar a estrutura do banco de dados pelo código.
 >
+> O método `up()` é onde ficam as alterações que serão feitas no banco, como criar uma tabela.
 >
+> Já o método `down()` serve para desfazer o que foi feito no `up()`.
+>
+> A ordem das migrations é importante porque uma tabela pode depender da outra. Nesse projeto, a tabela de livros depende da tabela de autores, porque existe uma chave estrangeira.
+>
+> O `foreignId('autor_id')->constrained('autores')` cria o campo `autor_id` e faz a ligação dele com o `id` da tabela `autores`.
 
 ---
 
@@ -247,20 +274,35 @@ Confira no MySQL se as tabelas `autores` e `livros` foram criadas.
 **Q3.1 — Como criar um controller? Qual a diferença de usar as opções `--resource` e `--model`?**
 
 > _Resposta:_
+> Para criar um controller no Laravel, usamos o comando `php artisan make:controller NomeController`.
 >
+> Nesse projeto, foi usado também `--resource` e `--model`.
 >
+> O `--resource` já cria os principais métodos que normalmente são usados em um CRUD, como `index`, `create`, `store`, `edit`, `update` e `destroy`.
+>
+> Já o `--model` indica qual model aquele controller vai utilizar.
 
 **Q3.2 — Como funciona um controller dentro da arquitetura MVC? Explique a comunicação entre Model, View e Controller e o que é o *Route Model Binding* (ex.: receber `Autor $autor` no método).**
 
 > _Resposta:_
+> O controller é a parte que recebe a requisição e decide o que deve ser feito.
 >
+> Na arquitetura MVC, a Model fica mais ligada aos dados e ao banco, a View mostra as informações na tela e o Controller faz a ligação entre essas partes.
 >
+> Por exemplo, o controller pode buscar os autores usando a model `Autor` e depois enviar esses dados para uma view.
+>
+> O Route Model Binding facilita a busca dos registros. Quando um método recebe algo como `Autor $autor`, o Laravel já consegue buscar o autor automaticamente pelo id que veio na rota.
 
 **Q3.3 — Como funciona o `$request->validate()`? O que acontece quando a validação falha e quando ela passa?**
 
 > _Resposta:_
+> O `$request->validate()` serve para verificar se os dados enviados pelo formulário estão de acordo com as regras definidas.
 >
+> Por exemplo, dá para informar que um campo é obrigatório usando `required`.
 >
+> Se a validação falhar, o Laravel volta para a página anterior e mostra os erros.
+>
+> Se estiver tudo certo, ele retorna os dados validados e esses dados podem ser usados para cadastrar ou atualizar um registro.
 
 ---
 
@@ -294,14 +336,37 @@ Confira no MySQL se as tabelas `autores` e `livros` foram criadas.
 **Q4.1 — Como criar as rotas de um CRUD no Laravel? Quais rotas o `Route::resource` gera (método HTTP, URI, ação e nome)?**
 
 > _Resposta:_
+> Uma forma mais prática de criar as rotas de um CRUD é usando `Route::resource()`.
 >
+> Por exemplo:
 >
+> `Route::resource('autores', AutorController::class);`
+>
+> Com isso, o Laravel cria automaticamente as principais rotas do CRUD.
+>
+> As rotas geradas são:
+>
+> - `GET /autores` para listar os autores
+> - `GET /autores/create` para abrir o formulário de cadastro
+> - `POST /autores` para salvar um novo autor
+> - `GET /autores/{autor}` para mostrar um autor
+> - `GET /autores/{autor}/edit` para abrir a edição
+> - `PUT/PATCH /autores/{autor}` para atualizar
+> - `DELETE /autores/{autor}` para excluir
+>
+> Nesse projeto, como a rota `show` não é necessária, ela pode ser retirada usando `except(['show'])`.
 
 **Q4.2 — Como funciona o sistema de rotas? Explique o caminho de uma requisição desde a URL até o controller e a utilidade das rotas nomeadas (`route('autores.index')`).**
 
 > _Resposta:_
+> As rotas são responsáveis por receber a URL acessada e mandar a requisição para o controller certo.
 >
+> Por exemplo, quando a pessoa acessa `/autores`, o Laravel verifica a rota e chama o método `index` do `AutorController`.
 >
+> Depois disso, o controller pode buscar os dados e mandar para uma view.
+>
+> As rotas nomeadas ajudam porque a gente não precisa ficar escrevendo a URL manualmente. Podemos usar, por exemplo, `route('autores.index')`.
+
 
 ---
 
@@ -343,14 +408,24 @@ Crie as quatro views abaixo. Todas devem estender o layout base com `@extends('l
 **Q5.1 — Como criar um formulário Blade para cadastro e para edição? Por que o formulário de edição precisa de `@method('PUT')` e para que serve o `@csrf`?**
 
 > _Resposta:_
+> O formulário Blade é criado usando HTML dentro de um arquivo `.blade.php`.
 >
+> Para cadastrar, normalmente usamos o método `POST`.
 >
+> Para editar, também usamos `POST` no formulário, mas colocamos `@method('PUT')` para informar ao Laravel que aquela ação é uma atualização.
+>
+> O `@csrf` serve como uma proteção de segurança do formulário, evitando requisições indevidas.
 
 **Q5.2 — Como funciona a exibição dos erros de validação e a manutenção dos dados digitados? Explique `$errors`, `@error` e `old()`.**
 
 > _Resposta:_
+> Quando acontece algum erro de validação, o Laravel guarda esses erros em `$errors`.
 >
+> O `@error` facilita mostrar o erro de um campo específico.
 >
+> Já o `old()` serve para manter o valor que a pessoa tinha digitado antes.
+>
+> Isso ajuda porque, se o formulário tiver algum erro, a pessoa não precisa preencher tudo novamente.
 
 ---
 
